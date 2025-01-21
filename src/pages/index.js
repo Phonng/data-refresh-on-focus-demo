@@ -2,7 +2,7 @@ import Head from "next/head";
 import Image from "next/image";
 import { Geist, Geist_Mono } from "next/font/google";
 import styles from "@/styles/Home.module.css";
-import { useState, useEffect, useCallback, useRef } from "react";
+import useFetch from "@/hooks/useFetch";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -14,47 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export default function Home() {
-  const [pokemon, setPokemon] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const lastFetchTimeRef = useRef(0);
-
-  const fetchPokemons = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`https://dog.ceo/api/breeds/image/random`);
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      const data = await response.json();
-      lastFetchTimeRef.current = Date.now();
-      setPokemon(data.message);
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPokemons(fetchPokemons);
-    const handleRefetch = () => {
-      const currentTime = Date.now();
-      if (
-        lastFetchTimeRef.current &&
-        currentTime - lastFetchTimeRef.current <= 5000
-      )
-        return;
-      // Check if 5 seconds have passed
-      fetchPokemons();
-    };
-    window.addEventListener("focus", handleRefetch);
-
-    return () => {
-      window.addEventListener("blur", handleRefetch);
-    };
-  }, []);
+  const { data, loading, error } = useFetch({
+    link: `https://dog.ceo/api/breeds/image/random`,
+  });
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error}</p>;
   return (
@@ -69,7 +31,7 @@ export default function Home() {
         className={`${styles.page} ${geistSans.variable} ${geistMono.variable}`}
       >
         <main className={styles.main}>
-          <img src={pokemon} />
+          <img src={data.message} />
         </main>
         <footer className={styles.footer}></footer>
       </div>
