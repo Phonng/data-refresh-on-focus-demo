@@ -34,10 +34,11 @@
   grid-row-start: 2;
   max-width: 400px;
   max-height: 300px;
-  img {
-    max-width: 400px;
-    max-height: 300px;
-  }
+}
+
+.main img {
+  max-width: 400px;
+  max-height: 300px;
 }
 
 .main ol {
